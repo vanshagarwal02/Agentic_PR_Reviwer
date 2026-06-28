@@ -1,0 +1,222 @@
+[
+  {
+    "id": "sql_injection_01",
+    "function_name": "get_user_by_name",
+    "file_path": "db.py",
+    "function_source": "def get_user_by_name(username):\n    import sqlite3\n    conn = sqlite3.connect('users.db')\n    cursor = conn.cursor()\n    query = \"SELECT * FROM users WHERE name='\" + username + \"'\"\n    cursor.execute(query)\n    return cursor.fetchone()",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "SQL_INJECTION",
+    "cwe": "CWE-89",
+    "description": "Classic SQL injection via string concatenation in query"
+  },
+  {
+    "id": "sql_injection_02",
+    "function_name": "search_products",
+    "file_path": "store.py",
+    "function_source": "def search_products(keyword):\n    import sqlite3\n    db = sqlite3.connect('shop.db')\n    cur = db.cursor()\n    sql = f\"SELECT id, name, price FROM products WHERE name LIKE '%{keyword}%'\"\n    cur.execute(sql)\n    return cur.fetchall()",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "SQL_INJECTION",
+    "cwe": "CWE-89",
+    "description": "SQL injection via f-string interpolation in LIKE clause"
+  },
+  {
+    "id": "hardcoded_secret_01",
+    "function_name": "get_db_connection",
+    "file_path": "config.py",
+    "function_source": "def get_db_connection():\n    import psycopg2\n    return psycopg2.connect(\n        host='prod-db.company.com',\n        database='customers',\n        user='admin',\n        password='SuperSecret123!'\n    )",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "HARDCODED_SECRET",
+    "cwe": "CWE-798",
+    "description": "Hardcoded database password in source code"
+  },
+  {
+    "id": "hardcoded_secret_02",
+    "function_name": "create_jwt_token",
+    "file_path": "auth.py",
+    "function_source": "def create_jwt_token(user_id):\n    import jwt\n    SECRET_KEY = 'my_super_secret_jwt_key_do_not_share'\n    payload = {'user_id': user_id}\n    return jwt.encode(payload, SECRET_KEY, algorithm='HS256')",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "HARDCODED_SECRET",
+    "cwe": "CWE-798",
+    "description": "Hardcoded JWT secret key"
+  },
+  {
+    "id": "path_traversal_01",
+    "function_name": "read_user_file",
+    "file_path": "files.py",
+    "function_source": "def read_user_file(username, filename):\n    base_dir = '/var/app/uploads'\n    filepath = base_dir + '/' + username + '/' + filename\n    with open(filepath, 'r') as f:\n        return f.read()",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "PATH_TRAVERSAL",
+    "cwe": "CWE-22",
+    "description": "Path traversal via unsanitized filename allowing ../../ sequences"
+  },
+  {
+    "id": "path_traversal_02",
+    "function_name": "serve_template",
+    "file_path": "templates.py",
+    "function_source": "def serve_template(template_name):\n    import os\n    template_dir = '/app/templates'\n    template_path = os.path.join(template_dir, template_name)\n    with open(template_path) as f:\n        return f.read()",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "MEDIUM",
+    "vulnerability_type": "PATH_TRAVERSAL",
+    "cwe": "CWE-22",
+    "description": "Path traversal via os.path.join without path canonicalization check"
+  },
+  {
+    "id": "command_injection_01",
+    "function_name": "ping_host",
+    "file_path": "network.py",
+    "function_source": "def ping_host(hostname):\n    import os\n    result = os.system('ping -c 1 ' + hostname)\n    return result == 0",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "CMD_INJECTION",
+    "cwe": "CWE-78",
+    "description": "OS command injection via string concatenation with os.system"
+  },
+  {
+    "id": "command_injection_02",
+    "function_name": "convert_image",
+    "file_path": "media.py",
+    "function_source": "def convert_image(input_file, output_format):\n    import subprocess\n    cmd = f'convert {input_file} output.{output_format}'\n    subprocess.run(cmd, shell=True)\n    return f'output.{output_format}'",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "CMD_INJECTION",
+    "cwe": "CWE-78",
+    "description": "Command injection via shell=True with unsanitized input"
+  },
+  {
+    "id": "insecure_deser_01",
+    "function_name": "load_user_session",
+    "file_path": "session.py",
+    "function_source": "def load_user_session(session_data_b64):\n    import pickle, base64\n    session_bytes = base64.b64decode(session_data_b64)\n    session = pickle.loads(session_bytes)\n    return session",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "INSECURE_DESERIALIZATION",
+    "cwe": "CWE-502",
+    "description": "Insecure deserialization: pickle.loads on user-controlled input"
+  },
+  {
+    "id": "insecure_deser_02",
+    "function_name": "restore_config",
+    "file_path": "config_loader.py",
+    "function_source": "def restore_config(config_str):\n    import yaml\n    config = yaml.load(config_str)\n    return config",
+    "expected_verdict": "REQUEST_CHANGES",
+    "expected_risk": "HIGH",
+    "vulnerability_type": "INSECURE_DESERIALIZATION",
+    "cwe": "CWE-502",
+    "description": "yaml.load without Loader argument allows arbitrary code execution"
+  },
+  {
+    "id": "safe_sql_01",
+    "function_name": "get_user_safe",
+    "file_path": "db.py",
+    "function_source": "def get_user_safe(username):\n    import sqlite3\n    conn = sqlite3.connect('users.db')\n    cursor = conn.cursor()\n    cursor.execute('SELECT * FROM users WHERE name = ?', (username,))\n    return cursor.fetchone()",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Parameterized query — safe against SQL injection"
+  },
+  {
+    "id": "safe_config_01",
+    "function_name": "get_db_connection_safe",
+    "file_path": "config.py",
+    "function_source": "def get_db_connection_safe():\n    import os\n    import psycopg2\n    return psycopg2.connect(\n        host=os.environ['DB_HOST'],\n        database=os.environ['DB_NAME'],\n        user=os.environ['DB_USER'],\n        password=os.environ['DB_PASSWORD']\n    )",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Credentials loaded from environment variables — safe"
+  },
+  {
+    "id": "safe_file_01",
+    "function_name": "read_user_file_safe",
+    "file_path": "files.py",
+    "function_source": "def read_user_file_safe(username, filename):\n    import os\n    base_dir = '/var/app/uploads'\n    safe_filename = os.path.basename(filename)\n    filepath = os.path.join(base_dir, username, safe_filename)\n    real_path = os.path.realpath(filepath)\n    if not real_path.startswith(os.path.realpath(base_dir)):\n        raise ValueError('Path traversal detected')\n    with open(real_path, 'r') as f:\n        return f.read()",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Path traversal prevention with basename + realpath check"
+  },
+  {
+    "id": "safe_subprocess_01",
+    "function_name": "ping_host_safe",
+    "file_path": "network.py",
+    "function_source": "def ping_host_safe(hostname):\n    import subprocess\n    import re\n    if not re.match(r'^[a-zA-Z0-9.-]+$', hostname):\n        raise ValueError('Invalid hostname')\n    result = subprocess.run(\n        ['ping', '-c', '1', hostname],\n        capture_output=True,\n        timeout=5\n    )\n    return result.returncode == 0",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Safe subprocess call with input validation and no shell=True"
+  },
+  {
+    "id": "safe_yaml_01",
+    "function_name": "load_config_safe",
+    "file_path": "config_loader.py",
+    "function_source": "def load_config_safe(config_str):\n    import yaml\n    config = yaml.safe_load(config_str)\n    if not isinstance(config, dict):\n        raise ValueError('Config must be a YAML mapping')\n    return config",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "yaml.safe_load prevents arbitrary code execution"
+  },
+  {
+    "id": "safe_auth_01",
+    "function_name": "verify_password",
+    "file_path": "auth.py",
+    "function_source": "def verify_password(plain_password, hashed_password):\n    import bcrypt\n    return bcrypt.checkpw(\n        plain_password.encode('utf-8'),\n        hashed_password.encode('utf-8')\n    )",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Proper bcrypt password verification"
+  },
+  {
+    "id": "safe_api_01",
+    "function_name": "calculate_tax",
+    "file_path": "billing.py",
+    "function_source": "def calculate_tax(amount, tax_rate):\n    if not isinstance(amount, (int, float)) or amount < 0:\n        raise ValueError('Amount must be a non-negative number')\n    if not 0 <= tax_rate <= 1:\n        raise ValueError('Tax rate must be between 0 and 1')\n    return round(amount * tax_rate, 2)",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Well-validated pure business logic function"
+  },
+  {
+    "id": "safe_io_01",
+    "function_name": "save_report",
+    "file_path": "reports.py",
+    "function_source": "def save_report(report_data, report_id):\n    import os, json\n    if not str(report_id).isdigit():\n        raise ValueError('report_id must be numeric')\n    output_dir = '/var/reports'\n    os.makedirs(output_dir, exist_ok=True)\n    filepath = os.path.join(output_dir, f'report_{report_id}.json')\n    with open(filepath, 'w') as f:\n        json.dump(report_data, f, indent=2)\n    return filepath",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Safe file write with numeric ID validation and fixed output directory"
+  },
+  {
+    "id": "safe_network_01",
+    "function_name": "fetch_public_data",
+    "file_path": "client.py",
+    "function_source": "def fetch_public_data(api_url):\n    import requests\n    from urllib.parse import urlparse\n    parsed = urlparse(api_url)\n    if parsed.scheme not in ('http', 'https'):\n        raise ValueError('Only HTTP/HTTPS URLs allowed')\n    if not parsed.netloc:\n        raise ValueError('URL must have a host')\n    response = requests.get(api_url, timeout=10)\n    response.raise_for_status()\n    return response.json()",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "HTTP fetch with URL scheme validation and timeout"
+  },
+  {
+    "id": "safe_crypto_01",
+    "function_name": "generate_api_key",
+    "file_path": "keys.py",
+    "function_source": "def generate_api_key(length=32):\n    import secrets\n    import string\n    alphabet = string.ascii_letters + string.digits\n    return ''.join(secrets.choice(alphabet) for _ in range(length))",
+    "expected_verdict": "APPROVE",
+    "expected_risk": "LOW",
+    "vulnerability_type": "NONE",
+    "cwe": null,
+    "description": "Cryptographically secure random API key generation using secrets module"
+  }
+]

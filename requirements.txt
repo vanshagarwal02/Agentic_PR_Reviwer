@@ -1,0 +1,32 @@
+# ── Week 1 ────────────────────────────────────────────────────────────────────
+PyGithub==2.3.0           # GitHub API wrapper (handles auth, pagination, rate limits)
+fastapi==0.111.0          # Webhook server + future REST API
+uvicorn[standard]==0.29.0 # ASGI server to run FastAPI
+python-dotenv==1.0.1      # Load secrets from .env file (never hardcode tokens!)
+tree-sitter==0.21.3       # AST parser — understands Python/C/C++ code structure
+tree-sitter-python==0.21.0  # Python grammar for tree-sitter
+tree-sitter-c==0.21.3     # C grammar for tree-sitter
+requests==2.31.0          # HTTP requests (ngrok health checks, etc.)
+python-multipart==0.0.9   # FastAPI needs this for form data in webhooks
+
+# ── Week 2 ────────────────────────────────────────────────────────────────────
+networkx==3.3             # Call graph as directed graph (nodes=functions, edges=calls)
+matplotlib==3.9.0         # Visualise call graphs during development
+
+# ── Week 3 ────────────────────────────────────────────────────────────────────
+transformers==4.41.2      # HuggingFace: CodeBERT model
+torch==2.3.0              # PyTorch backend for transformers
+faiss-cpu==1.8.0          # Vector similarity search (find similar code patterns)
+datasets==2.19.1          # HuggingFace datasets (CodeSearchNet, BigVul)
+numpy==1.26.4             # Array operations
+
+# ── Week 4 ────────────────────────────────────────────────────────────────────
+scikit-learn==1.5.0       # Evaluation metrics (F1, precision, recall)
+accelerate==0.30.0        # Speed up HuggingFace training
+
+# ── Week 5 ────────────────────────────────────────────────────────────────────
+google-generativeai==0.7.2  # Gemini 2.5 Flash API
+
+# ── Week 7 ────────────────────────────────────────────────────────────────────
+psycopg2-binary==2.9.9    # PostgreSQL driver (store review history)
+google-genai

@@ -1,0 +1,43 @@
+services:
+  # ── AI Code Reviewer API ────────────────────────────────────────────────────
+  api:
+    build: .
+    container_name: ai_reviewer_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - ./models:/app/models
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── React Dashboard ─────────────────────────────────────────────────────────
+  dashboard:
+    image: node:20-alpine
+    container_name: ai_reviewer_dashboard
+    working_dir: /app
+    volumes:
+      - ./dashboard:/app
+    ports:
+      - "3000:3000"
+    # npm run dev already includes --host (from package.json).
+    # VITE_API_BASE tells vite.config.js to proxy /api → http://api:8000
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      - VITE_API_BASE=http://api:8000
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ai_reviewer_net
